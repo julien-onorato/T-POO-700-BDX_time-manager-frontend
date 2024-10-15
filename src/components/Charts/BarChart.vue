@@ -1,0 +1,47 @@
+<template>
+  <Bar :data="chartData" :options="chartOptions" />
+</template>
+  
+<script>
+  import { Bar } from 'vue-chartjs';
+  import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
+  
+  ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
+  
+  export default {
+    name: 'BarChart',
+    components: { Bar },
+    props: {
+      chartData: {
+        type: Object,
+        required: true
+      },
+      chartOptions: {
+        type: Object,
+        default: () => ({
+          responsive: true,
+        //   maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Jours de la semaine'
+              }
+            },
+            y: {
+                beginAtZero: true,
+                min: 0,
+                max: 200,
+                title: {
+                display: true,
+                text: 'Heures travaillées'
+                }
+            }
+          }
+        })
+      }
+    }
+  };
+  </script>
+  
