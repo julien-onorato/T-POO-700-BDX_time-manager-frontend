@@ -6,6 +6,6 @@ import ChartManager from './components/ChartManager.vue';
 </script>
 
 <template>
-  <!-- <RouterView /> -->
+  <RouterView />
   <ChartManager />
 </template>
