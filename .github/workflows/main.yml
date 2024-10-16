@@ -50,8 +50,8 @@ jobs:
          docker pull andydck/frontend:latest
 
          # Stop and remove existing containers if they exist
-         # docker stop frontend_container || true
-         # docker rm frontend_container || true
+         docker stop frontend_container || true
+         docker rm frontend_container || true
 
          # Run the container with the necessary configurations
          docker run -d --name frontend_container -p 5173:5173 andydck/frontend:latest
