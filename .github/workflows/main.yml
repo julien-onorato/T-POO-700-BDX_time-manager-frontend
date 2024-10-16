@@ -54,11 +54,11 @@ jobs:
          # docker rm frontend_container || true
 
          # Run the container with the necessary configurations
-         docker run -d --name frontend_container -p 4000:4000 ${VPS_USERNAME}/frontend:latest
+         docker run -d -p 4000:4000 ${VPS_USERNAME}/frontend:latest
 
          # Optional: Wait for the container to start and check the status
          sleep 10  # Give some time for the service to start
-         if docker ps | grep "frontend_container"; then
+         if docker ps | grep "frontend"; then
           echo "Service is up and running!"
          else
           echo "Service failed to start"
