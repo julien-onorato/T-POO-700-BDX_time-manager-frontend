@@ -50,8 +50,8 @@ jobs:
          docker pull ${VPS_USERNAME}/frontend:latest
 
          # Stop and remove existing containers if they exist
-         docker stop frontend_container || true
-         docker rm frontend_container || true
+         # docker stop frontend_container || true
+         # docker rm frontend_container || true
 
          # Run the container with the necessary configurations
          docker run -d --name frontend_container -p 4000:4000 ${VPS_USERNAME}/frontend:latest
