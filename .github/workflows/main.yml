@@ -54,7 +54,7 @@ jobs:
          # docker rm frontend_container || true
 
          # Run the container with the necessary configurations
-         docker run -d -p 5173:5173 andydck/frontend:latest
+         docker run -d --name frontend_container -p 5173:5173 andydck/frontend:latest
 
          # Optional: Wait for the container to start and check the status
          sleep 10  # Give some time for the service to start
