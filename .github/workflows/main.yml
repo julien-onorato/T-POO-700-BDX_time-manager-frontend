@@ -46,15 +46,19 @@ jobs:
          chmod 600 key.pem
          # SSH into the VPS to execute Docker commands
          ssh -o StrictHostKeyChecking=no -i key.pem ${VPS_USERNAME}@${VPS_HOST} << 'EOF'
-         # Pull the latest Docker image
-         docker pull andydck/frontend:latest
 
-         # Stop and remove existing containers if they exist
-         docker stop frontend_container || true
-         docker rm frontend_container || true
+         # Accès au repo 
+         cd ~/new_repo/T-POO-700-BDX_time-manager-frontend/
 
-         # Run the container with the necessary configurations
-         docker run -d --name frontend_container -p 5173:5173 andydck/frontend:latest
+         # Supprimer les container si besoin
+         docker compose down
+
+         # Mettre à jour les fichiers depuis la branche main
+         git fetch origin
+         git reset --hard origin/main
+
+         # Démarrer les services Docker avec les fichiers à jour
+         docker compose up --build -d  # Build et démarrer les services en mode détaché
 
          # Optional: Wait for the container to start and check the status
          sleep 10  # Give some time for the service to start
