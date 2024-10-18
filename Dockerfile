@@ -13,7 +13,7 @@ RUN npm install
 COPY . .
 
 # Build du projet pour la production
-RUN npm run dev
+RUN npm run build
 
 # Étape 2: Utiliser un serveur pour servir les fichiers
 FROM node:18
