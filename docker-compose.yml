@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .  # Chemin vers le dossier du frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
