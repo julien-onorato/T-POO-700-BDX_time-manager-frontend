@@ -80,7 +80,7 @@ export default defineComponent({
   methods: {
     async getWorkingTimes() {
       try {
-        const response = await axios.get('http://134.209.208.89:4000/api/workingtime');
+        const response = await axios.get('http://localhost:4000/api/workingtime');
         const data = response.data.data;
 
         if (Array.isArray(data)) {

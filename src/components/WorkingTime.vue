@@ -66,10 +66,14 @@ export default defineComponent({
     },
     async getWorkingTimes(): Promise<void> {
       try {
-        const response = await axios.get<{ workingtimes: WorkingTime[] }>(
+        const response = await axios.get(
             `http://localhost:4000/api/workingtime/${this.userId}`
-        );
-        this.workingTimes = response.data.workingtimes;
+        ).then(({data}) => data.data)
+            .then(data => {
+              console.log("Data:", data)
+              this.workingTimes = data
+            })
+        console.log("Working times loaded:", this.workingTimes)
       } catch (error) {
         console.error("Error fetching working times:", error);
         this.errorMessage = "Failed to load working times. Please try again later.";
@@ -194,7 +198,7 @@ export default defineComponent({
     </div>
 
     <!-- Table Title and Display Existing Working Times -->
-    <div v-if="workingTimes.length > 0" class="mt-3">
+    <div v-if="workingTimes > 0" class="mt-3">
       <h3>Existing Working Times for <b-badge>{{ userId }}</b-badge></h3> <!-- Table Title -->
 
       <b-table striped hover :items="workingTimes" :fields="['date', 'startTime', 'endTime', 'actions']">

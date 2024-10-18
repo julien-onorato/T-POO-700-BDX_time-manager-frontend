@@ -5,7 +5,7 @@
       <p v-if="isClockedIn">Working since: {{ formatDateTime(startDateTime) }}</p>
       <p v-else>No work period in progress.</p>
     </div>
-    
+
     <button class="btn" v-if="!isClockedIn" @click="clockInHandler">Clock In</button>
 
     <button class="btn" v-if="isClockedIn" @click="clockOutHandler">Clock Out</button>
@@ -27,7 +27,7 @@
         </tr>
       </tbody>
     </table>
-    
+
     <h3>All User Clocks:</h3>
     <table v-if="allClocks.length" class="clock-table">
       <thead>
@@ -67,8 +67,8 @@ const formatDateTime = (dateString: string | null) => {
 
 const getAllClocks = async () => {
   try {
-    const response = await axios.get(`http://134.209.208.89:4000/api/clocks/${userID}`);
-    
+    const response = await axios.get(`http://localhost:4000/api/clocks/${userID}`);
+
     const clocksData = response.data.clock_periods;
 
     if (!Array.isArray(clocksData)) {
@@ -107,7 +107,7 @@ const getAllClocks = async () => {
 const clockInHandler = async () => {
   try {
     const clockInTime = new Date().toISOString();
-    const response = await axios.post(`http://134.209.208.89:4000/api/clocks/${userID}`, {
+    const response = await axios.post(`http://localhost:4000/api/clocks/${userID}`, {
       userID,
       clock_in: clockInTime,
     });
@@ -132,10 +132,10 @@ const clockInHandler = async () => {
 
 const clockOutHandler = async () => {
   try {
-    const response = await axios.post(`http://134.209.208.89:4000/api/clocks/${userID}/out`);
-    
+    const response = await axios.post(`http://localhost:4000/api/clocks/${userID}/out`);
+
     const clockOutTime = new Date().toISOString();
-    
+
     console.log('Clock Out Response:', response.data);
 
     startDateTime.value = null;
@@ -144,7 +144,7 @@ const clockOutHandler = async () => {
     if (currentClockPeriod.value) {
       currentClockPeriod.value.clockOut = clockOutTime;
     }
-    
+
     toast.success(response.data.message);
   } catch (error) {
     console.error('Error during clock out:', error);

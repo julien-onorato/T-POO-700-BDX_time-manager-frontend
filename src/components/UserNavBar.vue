@@ -40,7 +40,7 @@ const toast = useToast();
 
 const createUser = async (username: string, email: string): Promise<void> => {
   try {
-    const response = await axios.post<{ user: User }>('http://134.209.208.89:4000/api/users', {
+    const response = await axios.post<{ user: User }>('http://localhost:4000/api/users', {
       user: { username, email }
     });
     user.value = response.data.user;
@@ -55,7 +55,7 @@ const createUser = async (username: string, email: string): Promise<void> => {
 const updateUser = async (username: String, email: String): Promise<void> => {
   if (!user.value) return;
   try {
-    const response = await axios.put<{ user: User }>(`http://134.209.208.89:4000/api/users/${user.value.id}`, {
+    const response = await axios.put<{ user: User }>(`http://localhost:4000/api/users/${user.value.id}`, {
       user: {
         username: username,
         email: email
@@ -84,7 +84,7 @@ const deleteUser = async (): Promise<void> => {
     return;
   }
   try {
-    await axios.delete(`http://134.209.208.89:4000/api/users/${user.value.id}`);
+    await axios.delete(`http://localhost:4000/api/users/${user.value.id}`);
     user.value = null;
     localStorage.removeItem('user');
     toast.success("User deleted");

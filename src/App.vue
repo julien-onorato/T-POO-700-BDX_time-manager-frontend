@@ -1,11 +1,13 @@
 <script setup lang="ts">
 
-// import { RouterLink, RouterView } from 'vue-router'
-import ChartManager from './components/ChartManager.vue';
+import { RouterLink, RouterView } from 'vue-router'
+import Login from './components/Auth/Login.vue';
+import Register from './components/Auth/Register.vue';
 
 </script>
 
 <template>
-  <RouterView />
-  <ChartManager />
+   <RouterView />
+   <Login />
+   <Register />
 </template>

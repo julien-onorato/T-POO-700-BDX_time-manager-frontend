@@ -3,7 +3,7 @@ import axios from "axios";
 import { defineComponent } from "vue";
 import { BTable } from "bootstrap-vue-3";
 
-export interface WorkingTime {
+interface WorkingTime {
   id: number; // Assuming ID is a number, adjust as necessary
   start: string;
   end: string;
@@ -28,10 +28,14 @@ export default defineComponent({
   methods: {
     async getWorkingTimes(): Promise<void> {
       try {
-        const response = await axios.get<{ workingtimes: WorkingTime[] }>(
-            `http://134.209.208.89:4000/api/workingtime/${this.userId}`
-        );
-        this.workingTimes = response.data.workingtimes;
+        const response = await axios.get(
+            `http://localhost:4000/api/workingtime/${this.userId}`
+        ).then(({data}) => data.data)
+            .then(data => {
+              console.log("Data:", data)
+              this.workingTimes = data
+            })
+        console.log("Working times loaded:", this.workingTimes)
       } catch (error) {
         console.error("Error fetching working times:", error);
         this.errorMessage = "Failed to load working times. Please try again later.";
@@ -93,7 +97,7 @@ export default defineComponent({
             {{ calculateDuration(data.item.start, data.item.end) }}
           </template>
         </b-table>
-        <p v-if="!workingTimes.length">No working times available.</p>
+        <p v-if="!workingTimes || workingTimes.length == 0">No working times available.</p>
         <p v-if="errorMessage">{{ errorMessage }}</p>
       </b-col>
     </b-row>
