@@ -1,4 +1,4 @@
-<template>
+  <template>
     <div class="login-page d-flex justify-content-center align-items-center">
       <b-card class="shadow-lg p-5 mb-5 bg-white rounded text-center" style="max-width: 400px;">
         <h1 class="title mb-4">Time Manager</h1>
@@ -13,13 +13,13 @@
               required
             ></b-form-input>
           </b-form-group>
-  
+
           <b-form-group label="PASSWORD" label-for="password-input">
             <b-input-group>
               <b-form-input
                 id="password-input"
                 v-model="password"
-                type="password"
+                :type="passwordFieldType"
                 placeholder="Enter your password"
                 required
               ></b-form-input>
@@ -30,23 +30,24 @@
               </b-input-group-append>
             </b-input-group>
           </b-form-group>
-  
+
           <b-link class="d-block mb-3 text-muted" href="#">Forgot your password?</b-link>
-  
+
           <b-button type="submit" variant="success" class="login-btn mb-3">
             LOGIN
           </b-button>
-  
+
           <b-link class="d-block text-muted" @click.prevent="goToRegister">New user? Signup</b-link>
-  
+
           <p class="text-danger">{{ errorMessage }}</p>
         </b-form>
       </b-card>
     </div>
-</template>
-  
-<script>
+  </template>
+
+  <script>
   import axios from "axios";
+
   export default {
     data() {
       return {
@@ -57,31 +58,42 @@
       };
     },
     methods: {
+      // Function to set a cookie
+      setCookie(name, value, days) {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+      },
+
+      // Login function
       async login() {
         try {
           const response = await axios.post("/api/auth/login", {
             email: this.email,
             password: this.password,
           });
-  
-          localStorage.setItem("token", response.data.token);
-          this.$router.push("/dashboard");
+
+          // Store token in a cookie instead of localStorage
+          this.setCookie("token", response.data.token, 7); // Token stored for 7 days
+          this.$router.push("/");
         } catch (error) {
           this.errorMessage = "Invalid credentials";
         }
       },
+
+      // Toggle password visibility
       togglePasswordVisibility() {
-        this.passwordFieldType =
-          this.passwordFieldType === "password" ? "text" : "password";
+        this.passwordFieldType = this.passwordFieldType === "password" ? "text" : "password";
       },
+
+      // Navigate to the registration page
       goToRegister() {
-      this.$router.push({ name: 'Register' });
-    },
+        this.$router.push({ name: 'Register' });
+      },
     },
   };
-</script>
-  
-<style scoped>
+  </script>
+
+  <style scoped>
   .login-page {
     height: 100vh;
     background-color: #f7f7f7;
@@ -105,5 +117,4 @@
   .login-btn:hover {
     background-color: #4e9a60;
   }
-</style>
-  
+  </style>

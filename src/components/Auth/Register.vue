@@ -54,6 +54,7 @@
 
 <script>
 import axios from "axios";
+
 export default {
   data() {
     return {
@@ -65,6 +66,13 @@ export default {
     };
   },
   methods: {
+    // Function to set a cookie
+    setCookie(name, value, days) {
+      const expires = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+    },
+
+    // Register function
     async register() {
       try {
         const response = await axios.post("/api/auth/register", {
@@ -73,16 +81,20 @@ export default {
           password: this.password,
         });
 
-        localStorage.setItem("token", response.data.token);
-        this.$router.push("/dashboard");
+        // Store token in a cookie instead of localStorage
+        this.setCookie("token", response.data.token, 7); // Token stored for 7 days
+        this.$router.push("/");
       } catch (error) {
         this.errorMessage = "Registration failed";
       }
     },
+
+    // Toggle password visibility
     togglePasswordVisibility() {
-      this.passwordFieldType =
-        this.passwordFieldType === "password" ? "text" : "password";
+      this.passwordFieldType = this.passwordFieldType === "password" ? "text" : "password";
     },
+
+    // Navigate to the login page
     goToLogin() {
       this.$router.push({ name: 'Login' });
     },

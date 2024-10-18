@@ -24,6 +24,8 @@ import router from './router'
 
 // Import Bootstrap Icons globally
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import '@fortawesome/fontawesome-free/css/all.css';
+
 
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
