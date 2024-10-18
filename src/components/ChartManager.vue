@@ -44,7 +44,15 @@ import BarChart from './Charts/BarChart.vue';
 import LineChart from './Charts/LineChart.vue';
 import RadarChart from './Charts/RadarChart.vue';
 import axios from 'axios';
-import type { WorkingTime } from "./WorkingTimes.vue";
+import type WorkingTime  from './WorkingTimes.vue';
+
+
+interface WorkingTime {
+  id?: number;
+  userId: number;
+  startTime: string;
+  endTime: string;
+}
 
 interface ChartData {
   labels: string[];

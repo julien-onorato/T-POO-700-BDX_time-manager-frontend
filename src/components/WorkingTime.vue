@@ -198,7 +198,7 @@ export default defineComponent({
     </div>
 
     <!-- Table Title and Display Existing Working Times -->
-    <div v-if="workingTimes > 0" class="mt-3">
+    <div v-if="workingTimes.length > 0" class="mt-3">
       <h3>Existing Working Times for <b-badge>{{ userId }}</b-badge></h3> <!-- Table Title -->
 
       <b-table striped hover :items="workingTimes" :fields="['date', 'startTime', 'endTime', 'actions']">
