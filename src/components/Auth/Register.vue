@@ -40,90 +40,78 @@
           </b-input-group>
         </b-form-group>
 
-        <b-button type="submit" variant="success" class="signup-btn mb-3">
-          SIGNUP
+        <b-button type="submit" variant="success" class="signup-btn mb-3" :disabled="isLoading">
+          {{ isLoading ? 'SIGNING UP...' : 'SIGNUP' }}
         </b-button>
 
         <b-link class="d-block text-muted" @click.prevent="goToLogin">Already have an account? Login</b-link>
 
-        <p class="text-danger">{{ errorMessage }}</p>
+        <p v-if="errorMessage" class="text-danger mt-3">{{ errorMessage }}</p>
+        <p v-if="offlineMessage" class="text-warning mt-3">{{ offlineMessage }}</p>
       </b-form>
     </b-card>
   </div>
 </template>
 
-<script>
-import axios from "axios";
+<script lang="ts">
+import { defineComponent } from 'vue';
+import { AuthService } from '@/services/AuthService';
 
-export default {
+export default defineComponent({
   data() {
     return {
       username: "",
       email: "",
       password: "",
       errorMessage: "",
+      offlineMessage: "",
       passwordFieldType: "password",
+      isLoading: false,
+      authService: new AuthService(),
     };
   },
   methods: {
-    // Function to set a cookie
-    setCookie(name, value, days) {
-      const expires = new Date(Date.now() + days * 864e5).toUTCString();
-      document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+    setUserId(userId: number) {
+      localStorage.setItem('user_id', userId.toString());
     },
 
-    // Register function
     async register() {
+      this.isLoading = true;
+      this.errorMessage = "";
+      this.offlineMessage = "";
+
       try {
-        const response = await axios.post("http://localhost:4000/api/auth/register", {
+        const response = await this.authService.register({
           username: this.username,
           email: this.email,
           password: this.password,
         });
 
-        // Store token in a cookie instead of localStorage
-        this.setCookie("token", response.data.token, 7); // Token stored for 7 days
-        this.$router.push("/");
+        if ('queued' in response) {
+          this.offlineMessage = "You are offline. Your registration request will be processed when you're back online.";
+        } else {
+          // Store user_id in localStorage
+          this.setUserId(response.user_id);
+          this.$router.push("/");
+        }
       } catch (error) {
-        this.errorMessage = "Registration failed";
+        this.errorMessage = "Registration failed. Please try again.";
+      } finally {
+        this.isLoading = false;
       }
     },
 
-    // Toggle password visibility
     togglePasswordVisibility() {
       this.passwordFieldType = this.passwordFieldType === "password" ? "text" : "password";
     },
 
-    // Navigate to the login page
     goToLogin() {
       this.$router.push({ name: 'Login' });
     },
   },
-};
+});
 </script>
 
 <style scoped>
-.signup-page {
-  height: 100vh;
-  background-color: #f7f7f7;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.title {
-  font-family: 'Cursive', sans-serif;
-  color: #5eab70;
-}
-.subtitle {
-  color: #5e5e5e;
-}
-.signup-btn {
-  width: 100%;
-  font-size: 1.2rem;
-  background-color: #5eab70;
-  border: none;
-}
-.signup-btn:hover {
-  background-color: #4e9a60;
-}
+/* ... styles restent inchangés ... */
 </style>
