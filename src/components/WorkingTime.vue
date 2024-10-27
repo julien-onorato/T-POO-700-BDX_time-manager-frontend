@@ -67,7 +67,9 @@ export default defineComponent({
     async getWorkingTimes(): Promise<void> {
       try {
         const response = await axios.get(
-            `http://localhost:4000/api/workingtime/${this.userId}`
+            `http://localhost:4000/api/workingtime/${this.userId}`,{
+              withCredentials: true // This allows sending cookies
+            }
         ).then(({data}) => data.data)
             .then(data => {
               console.log("Data:", data)
@@ -93,12 +95,15 @@ export default defineComponent({
       }
 
       try {
-        await axios.post(`/api/workingtime/${this.userId}`, {
+        await axios.post(`http://localhost:4000/api/workingtime/${this.userId}`, {
           workingtime: {
             start:  new Date(`${this.newWorkingTime.date} ${this.newWorkingTime.startTime}`).toISOString(),
             end:  new Date(`${this.newWorkingTime.date} ${this.newWorkingTime.endTime}`).toISOString(),
           },
-        });
+        },
+            {
+              withCredentials: true // This allows sending cookies
+            });
         await this.getWorkingTimes(); // Refresh the list after creation
         this.onReset(); // Reset the form after submission
         this.isFormVisible = false; // Hide the form after submission
@@ -109,11 +114,13 @@ export default defineComponent({
     },
     async updateWorkingTime(workingTimeId: number, startTime: string, endTime: string): Promise<void> {
       try {
-        await axios.put(`/api/workingtime/${workingTimeId}`, {
+        await axios.put(`http://localhost:4000/api/workingtime/${workingTimeId}`, {
           workingtime: {
             start: new Date(`${this.updatedWorkingTime.date} ${this.updatedWorkingTime.startTime}`).toISOString(),
             end:new Date(`${this.updatedWorkingTime.date} ${this.updatedWorkingTime.endTime}`).toISOString(),
           },
+        },{
+          withCredentials: true // This allows sending cookies
         });
         await this.getWorkingTimes(); // Refresh list after update
         this.editingId = null; // Reset editing state
@@ -123,7 +130,7 @@ export default defineComponent({
     },
     async deleteWorkingTime(workingTimeId: number): Promise<void> {
       try {
-        await axios.delete(`/api/workingtime/${workingTimeId}`);
+        await axios.delete(`http://localhost:4000/api/workingtime/${workingTimeId}`);
         await this.getWorkingTimes(); // Refresh the list after deletion
       } catch (error) {
         console.error('Error deleting working time:', error);
@@ -198,7 +205,7 @@ export default defineComponent({
     </div>
 
     <!-- Table Title and Display Existing Working Times -->
-    <div v-if="workingTimes.length > 0" class="mt-3">
+    <div v-if="workingTimes" class="mt-3">
       <h3>Existing Working Times for <b-badge>{{ userId }}</b-badge></h3> <!-- Table Title -->
 
       <b-table striped hover :items="workingTimes" :fields="['date', 'startTime', 'endTime', 'actions']">
