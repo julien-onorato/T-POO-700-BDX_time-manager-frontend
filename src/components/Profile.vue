@@ -56,6 +56,8 @@
     id: 23, 
     username: 'Amelia Harper',
     email: 'amelia.harper@google.com',
+    role: 'Employee',
+    manager_id: 1
   });
 
   const editedUser = reactive({
@@ -78,7 +80,7 @@
 
   const submitChanges = async () => {
     try {
-      const response = await axios.put(`http://134.209.208.89:4000/api/users/${userID}`, {
+      const response = await axios.put(`http://134.209.208.89:4000/api/users/${user.id}`, {
         username: editedUser.username,
         email: editedUser.email,
       });
@@ -106,7 +108,7 @@
   const deleteAccount = async () => {
     if (confirm("Are you sure you want to delete your account?")) {
       try {
-        await axios.delete(`http://134.209.208.89:4000/api/users/${userID}`);
+        await axios.delete(`http://134.209.208.89:4000/api/users/${user.id}`);
         router.push("/");
       } catch (error) {
         console.error("Failed to delete", error);
