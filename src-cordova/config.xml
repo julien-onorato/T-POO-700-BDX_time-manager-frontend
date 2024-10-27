@@ -17,6 +17,7 @@
     
     <!-- Allow access to any external domain -->
     <access origin="*" />
+    <allow-navigation href="http://134.209.208.89:4000/*" />
     
     <!-- Allow intents to be opened from http and https URLs -->
     <allow-intent href="http://*/*" />
@@ -32,17 +33,29 @@
     
     <!-- iOS specific preferences -->
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
+
+    <preference name="scheme" value="app" />
+    <preference name="hostname" value="localhost" />
     
     <!-- Security and App Transport Security -->
     <platform name="ios">
-        <allow-navigation href="*" />
-        <access origin="*" />
-        <preference name="WKWebViewOnly" value="true" />
-        <preference name="NSAppTransportSecurity">
+        <config-file platform="ios" target="*-Info.plist" parent="NSAppTransportSecurity">
             <dict>
                 <key>NSAllowsArbitraryLoads</key>
                 <true/>
+                <key>NSExceptionDomains</key>
+                <dict>
+                    <key>134.209.208.89</key>
+                    <dict>
+                        <key>NSIncludesSubdomains</key>
+                        <true/>
+                        <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                        <true/>
+                        <key>NSTemporaryExceptionMinimumTLSVersion</key>
+                        <string>TLSv1.0</string>
+                    </dict>
+                </dict>
             </dict>
-        </preference>
+        </config-file>
     </platform>
 </widget>

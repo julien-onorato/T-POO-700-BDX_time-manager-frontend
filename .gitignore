@@ -10,3 +10,6 @@ node_modules
 /src-cordova/platforms
 /src-cordova/plugins
 /public/cordova.js
+
+# Web Builds
+dist
