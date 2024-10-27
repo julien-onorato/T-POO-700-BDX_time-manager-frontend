@@ -3,7 +3,7 @@ import axios from "axios";
 import { defineComponent } from "vue";
 import { BTable } from "bootstrap-vue-3";
 
-interface WorkingTime {
+export interface WorkingTime {
   id: number; // Assuming ID is a number, adjust as necessary
   start: string;
   end: string;
@@ -29,7 +29,9 @@ export default defineComponent({
     async getWorkingTimes(): Promise<void> {
       try {
         const response = await axios.get(
-            `http://localhost:4000/api/workingtime/${this.userId}`
+            `http://localhost:4000/api/workingtime/${this.userId}`,{
+              withCredentials: true // This allows sending cookies
+            }
         ).then(({data}) => data.data)
             .then(data => {
               console.log("Data:", data)
@@ -74,29 +76,31 @@ export default defineComponent({
   <b-container>
     <b-row>
       <b-col>
-        <h2>Working Times for User <b-badge>{{ userId }}</b-badge> </h2>
-        <b-table striped hover :items="workingTimes" :fields="['id', 'date', 'start', 'end', 'duration']">
-          <!-- ID column -->
-          <template #cell(id)="data">
-            {{ data.item.id }}
-          </template>
-          <!-- Date column: Display the date -->
-          <template #cell(date)="data">
-            {{ formatDate(data.item.start) }}
-          </template>
-          <!-- Start Time column: Only display the hour -->
-          <template #cell(start)="data">
-            {{ formatHour(data.item.start) }}
-          </template>
-          <!-- End Time column: Only display the hour -->
-          <template #cell(end)="data">
-            {{ formatHour(data.item.end) }}
-          </template>
-          <!-- Duration column -->
-          <template #cell(duration)="data">
-            {{ calculateDuration(data.item.start, data.item.end) }}
-          </template>
-        </b-table>
+        <h2>Working Times for User <b-badge>{{ userId }}</b-badge></h2>
+        <!-- Scrollable container for working times -->
+        <div class="scrollable-container">
+          <b-row v-if="workingTimes.length">
+            <b-col cols="12" v-for="(time, index) in workingTimes" :key="time.id" class="mb-3">
+              <b-card class="text-center" border-variant="light">
+                <b-card-text>
+                  <!-- Display Date -->
+                  <div class="date"> <strong>Date:</strong> {{ formatDate(time.start) }}</div>
+
+                  <!-- Display Start and End Time Side by Side -->
+                  <div class="time-container">
+                    <div class="startTime"><strong>Start:</strong> {{ formatHour(time.start) }}</div>
+                    <div class="endTime"><strong>End:</strong> {{ formatHour(time.end) }}</div>
+                  </div>
+
+                  <!-- Duration -->
+                  <div class="duration"><strong>Duration:</strong> {{ calculateDuration(time.start, time.end) }}</div>
+                </b-card-text>
+              </b-card>
+            </b-col>
+          </b-row>
+        </div>
+
+        <!-- Show message if no working times are available -->
         <p v-if="!workingTimes || workingTimes.length == 0">No working times available.</p>
         <p v-if="errorMessage">{{ errorMessage }}</p>
       </b-col>
@@ -104,6 +108,40 @@ export default defineComponent({
   </b-container>
 </template>
 
-<style scoped>
 
+<style scoped>
+.scrollable-container {
+  max-height: 400px; /* Adjust this value as needed */
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #dee2e6; /* Optional border for better visual */
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.date {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.time-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.startTime {
+  padding-right: 10px;
+  color: green;
+}
+
+.endTime {
+  padding-left: 10px;
+  color: red;
+}
+
+.duration {
+  font-size: 1.1rem;
+  margin-top: 10px;
+}
 </style>

@@ -1,49 +1,57 @@
 <template>
-  <div>
-    <h2>Clock Manager</h2>
-    <div>
-      <p v-if="isClockedIn">Working since: {{ formatDateTime(startDateTime) }}</p>
-      <p v-else>No work period in progress.</p>
+  <div class="clock-manager">
+    <div class="left">
+      <h3>Pointer</h3>
+      <div class="status-container">
+        <p v-if="isClockedIn">Working since: <strong>{{ formatDateTime(startDateTime) }}</strong></p>
+        <p v-else>No work period in progress.</p>
+      </div>
+      <a href="#" class="absence-link">Declare an absence</a>
+      <div class="buttons-container">
+        <button class="btn btn-success btn-md btn-spacing text-white clock-btn" v-if="!isClockedIn" @click="clockInHandler">Clock In</button>
+        <button class="btn btn-success btn-md btn-spacing text-white clock-btn clock-btn" v-if="isClockedIn" @click="clockOutHandler">Clock Out</button>
+      </div>
     </div>
+    <div class="right">
+      <h3>Current Clock Period</h3>
+      <table v-if="currentClockPeriod" class="clock-table">
+        <thead>
+          <tr>
+            <th>Clock In</th>
+            <th>Clock Out</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ formatDateTime(currentClockPeriod.clockIn) }}</td>
+            <td>{{ currentClockPeriod.clockOut ? formatDateTime(currentClockPeriod.clockOut) : 'In progress' }}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <button class="btn" v-if="!isClockedIn" @click="clockInHandler">Clock In</button>
-
-    <button class="btn" v-if="isClockedIn" @click="clockOutHandler">Clock Out</button>
-
-    <button class="btn" @click="getAllClocks">Show All Clocks</button>
-
-    <h3>Current Clock Period:</h3>
-    <table v-if="currentClockPeriod" class="clock-table">
-      <thead>
-        <tr>
-          <th class="stubborn">Clock In</th>
-          <th class="stubborn">Clock Out</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{{ formatDateTime(currentClockPeriod.clockIn) }}</td>
-          <td>{{ currentClockPeriod.clockOut ? formatDateTime(currentClockPeriod.clockOut) : 'In progress' }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>All User Clocks:</h3>
-    <table v-if="allClocks.length" class="clock-table">
-      <thead>
-        <tr>
-          <th class="stubborn">Clock In</th>
-          <th class="stubborn">Clock Out</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(period, index) in allClocks" :key="index">
-          <td>{{ period.clockIn ? formatDateTime(period.clockIn) : 'N/A' }}</td>
-          <td>{{ period.clockOut ? formatDateTime(period.clockOut) : 'In progress' }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <p v-else>No clocks found.</p>
+      <div class="buttons-container">
+        <button class="btn btn-success btn-md btn-spacing text-white clock-btn clock-btn show-all-btn" @click="toggleClocks">
+          {{ showClocks ? 'Hide All Clocks' : 'Show All Clocks' }}
+        </button>
+      </div>
+      <div v-if="showClocks" class="scrollable-table">
+        <table v-if="allClocks.length" class="clock-table">
+          <thead>
+            <tr>
+              <th>Clock In</th>
+              <th>Clock Out</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(period, index) in allClocks" :key="index">
+              <td>{{ period.clockIn ? formatDateTime(period.clockIn) : 'N/A' }}</td>
+              <td>{{ period.clockOut ? formatDateTime(period.clockOut) : 'In progress' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-else>No clocks found.</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -58,16 +66,26 @@ const startDateTime = ref<string | null>(null);
 const isClockedIn = ref(false);
 const allClocks = ref<Array<{ clockIn: string | null; clockOut: string | null }>>([]);
 const currentClockPeriod = ref<{ clockIn: string; clockOut?: string } | null>(null);
-
 const userID = '8';
 
 const formatDateTime = (dateString: string | null) => {
   return dateString ? new Date(dateString).toLocaleString() : 'N/A';
 };
 
+const showClocks = ref(false);
+
+const toggleClocks = () => {
+  showClocks.value = !showClocks.value;
+  if (showClocks.value && allClocks.value.length === 0) {
+    getAllClocks();
+  }
+};
+
 const getAllClocks = async () => {
   try {
-    const response = await axios.get(`http://localhost:4000/api/clocks/${userID}`);
+    const response = await axios.get(`http://localhost:4000/api/clocks/${userID}`,{
+      withCredentials: true // This allows sending cookies
+    });
 
     const clocksData = response.data.clock_periods;
 
@@ -97,6 +115,7 @@ const getAllClocks = async () => {
       });
     }
 
+    allClocks.value.reverse();
     toast.success('All clocks loaded successfully!');
   } catch (error) {
     console.error('Error fetching all clocks:', error);
@@ -110,13 +129,9 @@ const clockInHandler = async () => {
     const response = await axios.post(`http://localhost:4000/api/clocks/${userID}`, {
       userID,
       clock_in: clockInTime,
+    },{
+      withCredentials: true // This allows sending cookies
     });
-
-    console.log('Clock In Response:', response.data);
-
-    if (!response.data || !response.data.clock_period || !response.data.clock_period.clock_in) {
-      throw new Error('Invalid response structure');
-    }
 
     startDateTime.value = response.data.clock_period.clock_in;
     isClockedIn.value = true;
@@ -129,14 +144,12 @@ const clockInHandler = async () => {
   }
 };
 
-
 const clockOutHandler = async () => {
   try {
-    const response = await axios.post(`http://localhost:4000/api/clocks/${userID}/out`);
-
+    const response = await axios.post(`http://localhost:4000/api/clocks/${userID}/out`,{
+      withCredentials: true // This allows sending cookies
+    });
     const clockOutTime = new Date().toISOString();
-
-    console.log('Clock Out Response:', response.data);
 
     startDateTime.value = null;
     isClockedIn.value = false;
@@ -154,27 +167,59 @@ const clockOutHandler = async () => {
 </script>
 
 <style scoped>
-h2 {
-  margin-bottom: 1rem;
+.clock-manager {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  border-radius: 10px;
 }
 
-.btn {
-  padding: 10px 20px;
-  margin: 0.5rem 0;
-  border: none;
-  border-radius: 5px;
-  background-color: #4CAF50;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.left {
+  width: 40%; /* Left section will take 40% of the container */
+}
+
+.right {
+  width: 55%; /* Right section will take 55% of the container */
+}
+
+h3 {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.status-container {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.absence-link {
+  color: #4CAF50;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 1rem;
+  margin-top: 20px;
+  text-decoration: underline;
+}
+
+.absence-link:hover {
+  color: #155724;
+}
+
+.buttons-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 0px;
+  margin-top: 4px;
 }
 
 .btn:hover {
-  background-color: #45a049;
+  background-color: #155724 !important; /* Darker green for active selection */
+  border-color: #155724 !important;
 }
 
-.stubborn {
-  color: black;
+.clock-section {
+  margin-top: 1.5rem;
 }
 
 .clock-table {
@@ -185,11 +230,39 @@ h2 {
 
 .clock-table th, .clock-table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 10px;
+  text-align: center;
 }
 
 .clock-table th {
   background-color: #f2f2f2;
-  text-align: left;
+}
+
+.clock-table td {
+  font-size: 0.9rem;
+}
+
+.scrollable-table {
+  max-height: 274px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .clock-manager {
+    flex-direction: column;
+  }
+
+  .left, .right {
+    width: 100%;
+  }
+
+  .buttons-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn {
+    margin-bottom: 1rem;
+  }
 }
 </style>
