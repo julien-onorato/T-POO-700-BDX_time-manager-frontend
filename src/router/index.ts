@@ -3,18 +3,17 @@ import HomeView from '../views/HomeView.vue';
 
 // Fonction simulant la vérification de l'authentification
 function isAuthenticated() {
-  return !!localStorage.getItem('token'); // Vérifie si un token JWT est présent
+    const token = localStorage.getItem('token');
+    if(token) {
+        return true;
+
+    }
+  return false; // Vérifie si un token JWT est présent
 }
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/home',
-      name: 'Home',
-      component: HomeView,
-      props: true,
-    },
     {
       path: '/',
       name: 'Login',
@@ -24,6 +23,13 @@ const router = createRouter({
       path: '/register',
       name: 'Register',
       component: () => import('../components/Auth/Register.vue'),
+    },
+    {
+      path: '/home',
+      name: 'Home',
+      component: HomeView,
+      props: true,
+      meta: { requiresAuth: true }, // Route protégée
     },
     {
       path: '/clock/:userId',
@@ -50,6 +56,20 @@ const router = createRouter({
       path: '/chartManager/:userId',
       name: 'ChartManager',
       component: () => import('../components/ChartManager.vue'),
+      props: true,
+      meta: { requiresAuth: true }, // Route protégée
+    },
+    {
+      path: '/profile',
+      name: 'Profile',
+      component: () => import('../components/Profile.vue'),
+      props: true,
+      meta: { requiresAuth: true }, // Route protégée
+    },
+    {
+      path: '/changePassword',
+      name: 'ChangePassword',
+      component: () => import('../components/ChangePassword.vue'),
       props: true,
       meta: { requiresAuth: true }, // Route protégée
     },

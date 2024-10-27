@@ -67,16 +67,16 @@
       // Login function
       async login() {
         try {
-          const response = await axios.post("/api/auth/login", {
+          const response = await axios.post("http://localhost:4000/api/auth/login", {
             email: this.email,
             password: this.password,
           });
 
           // Store token in a cookie instead of localStorage
           this.setCookie("token", response.data.token, 7); // Token stored for 7 days
-          this.$router.push("/");
+          this.$router.push("/home");
         } catch (error) {
-          this.errorMessage = "Invalid credentials";
+          this.errorMessage = error.errorMessage;
         }
       },
 
