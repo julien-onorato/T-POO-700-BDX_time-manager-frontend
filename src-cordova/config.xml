@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.vue.example.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>TimeManager</name>
+    <description>Sample Apache Cordova App</description>
+    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
+        Apache Cordova Team
+    </author>
+    
+    <!-- this hook will point your config.xml to the DevServer on Serve -->
+    <hook type="after_prepare" src="../node_modules/vue-cli-plugin-cordova/serve-config-hook.js" />
+    
+    <!-- Main content file -->
+    <content src="index.html" />
+    
+    <!-- Allow navigation to any URL (needed for external requests and internal routing) -->
+    <allow-navigation href="*" />
+    
+    <!-- Allow access to any external domain -->
+    <access origin="*" />
+    <allow-navigation href="http://134.209.208.89:4000/*" />
+    
+    <!-- Allow intents to be opened from http and https URLs -->
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    
+    <!-- SplashScreen Preferences -->
+    <preference name="AutoHideSplashScreen" value="true" />
+    <preference name="SplashScreenDelay" value="3000" />
+    
+    <!-- Additional Preferences -->
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="WKWebViewOnly" value="true" />
+    
+    <!-- iOS specific preferences -->
+    <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
+
+    <preference name="scheme" value="app" />
+    <preference name="hostname" value="localhost" />
+    
+    <!-- Security and App Transport Security -->
+    <platform name="ios">
+        <config-file platform="ios" target="*-Info.plist" parent="NSAppTransportSecurity">
+            <dict>
+                <key>NSAllowsArbitraryLoads</key>
+                <true/>
+                <key>NSExceptionDomains</key>
+                <dict>
+                    <key>134.209.208.89</key>
+                    <dict>
+                        <key>NSIncludesSubdomains</key>
+                        <true/>
+                        <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                        <true/>
+                        <key>NSTemporaryExceptionMinimumTLSVersion</key>
+                        <string>TLSv1.0</string>
+                    </dict>
+                </dict>
+            </dict>
+        </config-file>
+    </platform>
+</widget>
