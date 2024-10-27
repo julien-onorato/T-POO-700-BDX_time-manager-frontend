@@ -19,10 +19,10 @@ export class ChartManagerService {
             );
 
             return response;
-          } catch (error) {
+        } catch (error) {
             console.error('Error during login:', error);
             throw error;
-          }
+        }
     }
 }
 
