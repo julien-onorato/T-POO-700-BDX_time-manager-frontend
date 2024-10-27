@@ -12,6 +12,11 @@ export interface RegisterCredentials {
   password: string;
 }
 
+export interface PasswordChangeCredentials {
+  oldPassword: string;
+  newPassword: string;
+}
+
 export interface AuthResponse {
     user_id: number;
 }
@@ -52,6 +57,30 @@ export class AuthService {
     try {
       const response = await this.queueService.handleRequest(
         `${this.baseUrl}/auth/register`,
+        'POST',
+        credentials
+      );
+      
+      if ('queued' in response) {
+        return response as QueueResponse;
+      }
+
+      
+      if ('user_id' in response && typeof response.user_id === 'number') {
+        return { user_id: response.user_id };
+      }
+      
+      throw new Error('Invalid response format from server');
+    } catch (error) {
+      console.error('Error during registration:', error);
+      throw error;
+    }
+  }
+
+  async submitPasswordChange(credentials: PasswordChangeCredentials, userId: number): Promise<AuthResponse | QueueResponse> {
+    try {
+      const response = await this.queueService.handleRequest(
+        `${this.baseUrl}/users/56/password`,
         'POST',
         credentials
       );

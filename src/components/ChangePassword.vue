@@ -52,7 +52,9 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { AuthService } from '@/services/AuthService';
 
+const authService = new AuthService();
 const passwords = ref({
   current: '',
   newPassword: '',
@@ -61,8 +63,6 @@ const passwords = ref({
 
 const errorMessage = ref('');
 const router = useRouter();
-// todo : recuperer userID
-const userID = ref(2);
 
 const submitPasswordChange = async () => {
   errorMessage.value = '';
@@ -71,10 +71,10 @@ const submitPasswordChange = async () => {
     return;
   }
   try {
-    const response = await axios.put(`http://134.209.208.89:4000/api/users/${userID}/password`, {
-      currentPassword: passwords.value.current,
-      newPassword: passwords.value.newPassword,
-    });
+    const response = await this.authService.submitPasswordChange({
+          oldPassword: passwords.value.current,
+          newPassword: passwords.value.newPassword,
+        });
 
     if (response.status === 200) {
       alert('Password changed successfully!');
